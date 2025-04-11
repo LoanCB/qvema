@@ -1,3 +1,4 @@
+import { SwaggerConfig } from '@config/helpers/swagger.config';
 import { ApiConfigService } from '@config/service/api-config.service';
 import { Logger, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
@@ -16,6 +17,9 @@ async function bootstrap() {
 
   app.setGlobalPrefix(APP_ROUTE_PREFIX);
   app.enableVersioning({ type: VersioningType.URI });
+  app.enableCors();
+
+  SwaggerConfig(app, configService.get('api_version'));
 
   await app.listen(PORT, () => logger.log(`🚀 Qvema is running on: ${APP_URL}/${APP_ROUTE_PREFIX}`));
 }
