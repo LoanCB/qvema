@@ -13,24 +13,24 @@ const configuration = () => ({
   port: parseInt(process.env.PORT ?? '3001', 10),
   app_url: process.env.APP_URL ?? 'http://localhost:3001',
 
-  sql_logging: ['true', undefined].includes(process.env.POSTGRES_LOGGING),
+  sql_logging: ['true', undefined].includes(process.env.DB_LOGGING),
   default_limit: parseInt(process.env.PAGINATION_DEFAULT_LIMIT ?? '15', 10),
 
   databases: {
-    postgres: {
-      host: process.env.POSTGRES_HOST ?? 'localhost',
-      port: parseInt(process.env.POSTGRES_PORT ?? '5432', 10),
-      username: process.env.POSTGRES_USERNAME,
-      password: process.env.POSTGRES_PASSWORD,
-      name: process.env.POSTGRES_NAME ?? 'qvema',
-      synchronize: process.env.POSTGRES_SYNCHRONIZE === 'true',
+    DB: {
+      host: process.env.DB_HOST ?? 'localhost',
+      port: parseInt(process.env.DB_PORT ?? '5432', 10),
+      username: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      name: process.env.DB_NAME ?? 'qvema',
+      synchronize: process.env.DB_SYNCHRONIZE === 'true',
     },
   },
 
-  // auth: {
-  //   caching_duration: parseInt(process.env.ACCESS_TOKEN_CACHING_DURATION ?? (1000 * 3600).toString()),
-  //   encrypt_password: process.env.ENCRYPT_PASSWORD,
-  // },
+  jwt: {
+    duration: parseInt(process.env.JWT_DURATION ?? '3600'),
+    secret: process.env.JWT_SECRET ?? '',
+  },
 });
 
 export default configuration;

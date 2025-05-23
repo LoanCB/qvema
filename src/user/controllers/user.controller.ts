@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Delete, Get, Param, ParseIntPipe } from '@nestjs/common';
 import { UserService } from '../services/user.service';
 
 @Controller({ path: 'users', version: ['1'] })
@@ -6,12 +6,17 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  async findAll() {
+    return await this.userService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return await this.userService.findOneById(+id);
+  }
+
+  @Delete(':id')
+  async deleteOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.userService.deleteOne(id);
   }
 }

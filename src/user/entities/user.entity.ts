@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Column } from 'typeorm';
 import { Role } from '../types/role.types';
 
-export class UserEntity extends TimestampEntity {
+export class User extends TimestampEntity {
   @ApiProperty({ example: 'john.doe@foo.com' })
   @Column({ unique: true })
   email: string;

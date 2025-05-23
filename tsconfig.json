@@ -20,11 +20,10 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "paths": {
+      "@src/*": ["src/*"],
+      "@auth/*": ["src/auth/*"],
       "@common/*": ["src/common/*"],
-      "@database/*": ["src/database/*"],
-      "@config/*": ["src/config/*"],
-      "@auth/*": ["src/modules/auth/*"],
-      "@src/*": ["src/*"]
+      "@config/*": ["src/config/*"]
     }
   }
 }
