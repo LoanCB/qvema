@@ -1,0 +1,55 @@
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
+import { Roles } from '@src/auth/decorators/role.decorator';
+import { GetUser } from '@src/auth/decorators/user.decorator';
+import { JwtAuthGuard } from '@src/auth/guards/jwt.guard';
+import { RolesGuard } from '@src/auth/guards/role.guard';
+import { User } from '@src/user/entities/user.entity';
+import { Role } from '@src/user/types/role.types';
+import { CreateProjectDto } from '../dtos/create-project.dto';
+import { UpdateProjectDto } from '../dtos/update-project.dto';
+import { Project } from '../entities/project.entity';
+import { ProjectService } from '../services/project.service';
+
+@Controller({ path: 'projects', version: ['1'] })
+@UseGuards(JwtAuthGuard, RolesGuard)
+export class ProjectController {
+  constructor(private readonly projectService: ProjectService) {}
+
+  @Post()
+  @Roles(Role.BUSINESS_MAN)
+  create(@Body() createProjectDto: CreateProjectDto, @GetUser() user: User): Promise<Project> {
+    return this.projectService.create(createProjectDto, user.id);
+  }
+
+  @Get()
+  findAll(): Promise<Project[]> {
+    return this.projectService.findAll();
+  }
+
+  @Get('recommended')
+  findRecommended(@GetUser() user: User): Promise<Project[]> {
+    return this.projectService.findRecommended(user.id);
+  }
+
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<Project> {
+    return this.projectService.findOne(id);
+  }
+
+  @Put(':id')
+  @Roles(Role.BUSINESS_MAN)
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateProjectDto: UpdateProjectDto,
+    @GetUser() user: User,
+  ): Promise<Project> {
+    return this.projectService.update(id, updateProjectDto, user.id);
+  }
+
+  @Delete(':id')
+  @Roles(Role.BUSINESS_MAN, Role.ADMIN)
+  remove(@Param('id', ParseIntPipe) id: number, @GetUser() user: User): Promise<void> {
+    const isAdmin = user.role === Role.ADMIN;
+    return this.projectService.remove(id, user.id, isAdmin);
+  }
+}
