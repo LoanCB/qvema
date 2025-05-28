@@ -17,7 +17,7 @@ const configuration = () => ({
   default_limit: parseInt(process.env.PAGINATION_DEFAULT_LIMIT ?? '15', 10),
 
   databases: {
-    DB: {
+    postgres: {
       host: process.env.DB_HOST ?? 'localhost',
       port: parseInt(process.env.DB_PORT ?? '5432', 10),
       username: process.env.DB_USER,
@@ -28,7 +28,7 @@ const configuration = () => ({
   },
 
   jwt: {
-    duration: parseInt(process.env.JWT_DURATION ?? '3600'),
+    duration: parseInt(process.env.JWT_EXPIRES ?? '3600'),
     secret: process.env.JWT_SECRET ?? '',
   },
 });

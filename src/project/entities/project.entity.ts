@@ -1,5 +1,6 @@
+import { TimestampEntity } from '@src/common/entities/timestamp.entity';
 import { User } from '@src/user/entities/user.entity';
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, Relation } from 'typeorm';
 
 export enum ProjectCategory {
   TECHNOLOGY = 'TECHNOLOGY',
@@ -10,11 +11,8 @@ export enum ProjectCategory {
   OTHER = 'OTHER',
 }
 
-@Entity('projects')
-export class Project {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+@Entity()
+export class Project extends TimestampEntity {
   @Column()
   title: string;
 
@@ -31,15 +29,9 @@ export class Project {
   })
   category: ProjectCategory;
 
+  @ManyToOne(() => User, (user) => user.id)
+  owner: Relation<User>;
+
   @Column()
   ownerId: number;
-
-  @ManyToOne(() => User)
-  owner: User;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 }

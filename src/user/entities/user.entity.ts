@@ -1,9 +1,10 @@
 import { TimestampEntity } from '@common/entities/timestamp.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Interest } from '@src/interest/entities/interest.entity';
-import { Column, ManyToMany } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, Relation } from 'typeorm';
 import { Role } from '../types/role.types';
 
+@Entity()
 export class User extends TimestampEntity {
   @ApiProperty({ example: 'john.doe@foo.com' })
   @Column({ unique: true })
@@ -26,5 +27,6 @@ export class User extends TimestampEntity {
   role: Role;
 
   @ManyToMany(() => Interest, (interest) => interest.users)
-  interests: Interest[];
+  @JoinTable()
+  interests: Relation<Interest>[];
 }

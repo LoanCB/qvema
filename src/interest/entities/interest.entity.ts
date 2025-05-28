@@ -1,23 +1,15 @@
+import { TimestampEntity } from '@src/common/entities/timestamp.entity';
 import { User } from '@src/user/entities/user.entity';
-import { Column, CreateDateColumn, Entity, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, Entity, ManyToMany, Relation } from 'typeorm';
 
-@Entity('interests')
-export class Interest {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+@Entity()
+export class Interest extends TimestampEntity {
   @Column({ unique: true })
   name: string;
 
-  @Column({ nullable: true })
-  description: string;
+  @Column({ type: 'character varying', nullable: true })
+  description?: string | null;
 
   @ManyToMany(() => User, (user) => user.interests)
-  users: User[];
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
+  users: Relation<User>[];
 }

@@ -1,30 +1,22 @@
+import { TimestampEntity } from '@src/common/entities/timestamp.entity';
 import { Project } from '@src/project/entities/project.entity';
 import { User } from '@src/user/entities/user.entity';
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, Relation } from 'typeorm';
 
-@Entity('investments')
-export class Investment {
-  @PrimaryGeneratedColumn()
-  id: number;
+@Entity()
+export class Investment extends TimestampEntity {
+  @Column('decimal', { precision: 10, scale: 2 })
+  amount: number;
+
+  @ManyToOne(() => User, (user) => user.id)
+  investor: Relation<User>;
 
   @Column()
   investorId: number;
 
+  @ManyToOne(() => Project, (project) => project.id)
+  project: Relation<Project>;
+
   @Column()
   projectId: number;
-
-  @Column('decimal', { precision: 10, scale: 2 })
-  amount: number;
-
-  @CreateDateColumn()
-  date: Date;
-
-  @ManyToOne(() => User)
-  investor: User;
-
-  @ManyToOne(() => Project)
-  project: Project;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 }
