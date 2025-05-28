@@ -18,7 +18,7 @@ export class InvestmentService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async create(createInvestmentDto: CreateInvestmentDto, investorId: number): Promise<Investment> {
+  async create(createInvestmentDto: CreateInvestmentDto, investorId: string): Promise<Investment> {
     const project = await this.projectRepository.findOne({
       where: { id: createInvestmentDto.projectId },
     });
@@ -38,19 +38,20 @@ export class InvestmentService {
     const investment = this.investmentRepository.create({
       ...createInvestmentDto,
       investorId,
+      projectId: createInvestmentDto.projectId,
     });
 
     return await this.investmentRepository.save(investment);
   }
 
-  async findInvestorInvestments(investorId: number): Promise<Investment[]> {
+  async findInvestorInvestments(investorId: string): Promise<Investment[]> {
     return await this.investmentRepository.find({
       where: { investorId },
       relations: ['project', 'investor'],
     });
   }
 
-  async findProjectInvestments(projectId: number, userId: number): Promise<Investment[]> {
+  async findProjectInvestments(projectId: string, userId: string): Promise<Investment[]> {
     const project = await this.projectRepository.findOne({
       where: { id: projectId },
     });
@@ -59,7 +60,6 @@ export class InvestmentService {
       throw new NotFoundException('Project not found');
     }
 
-    // Check if user is the project owner or an admin
     const user = await this.userRepository.findOne({
       where: { id: userId },
     });
@@ -78,7 +78,7 @@ export class InvestmentService {
     });
   }
 
-  async remove(id: number, userId: number): Promise<void> {
+  async remove(id: string, userId: string): Promise<void> {
     const investment = await this.investmentRepository.findOne({
       where: { id },
       relations: ['investor'],

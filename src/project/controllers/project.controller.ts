@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { Roles } from '@src/auth/decorators/role.decorator';
 import { GetUser } from '@src/auth/decorators/user.decorator';
 import { JwtAuthGuard } from '@src/auth/guards/jwt.guard';
 import { RolesGuard } from '@src/auth/guards/role.guard';
+import { LoggedUser } from '@src/auth/types/logged-user.type';
 import { User } from '@src/user/entities/user.entity';
 import { Role } from '@src/user/types/role.types';
 import { CreateProjectDto } from '../dtos/create-project.dto';
@@ -21,7 +22,7 @@ export class ProjectController {
 
   @Post()
   @Roles(Role.BUSINESS_MAN)
-  create(@Body() createProjectDto: CreateProjectDto, @GetUser() user: User): Promise<Project> {
+  create(@Body() createProjectDto: CreateProjectDto, @GetUser() user: LoggedUser): Promise<Project> {
     return this.projectService.create(createProjectDto, user.id);
   }
 
@@ -31,28 +32,24 @@ export class ProjectController {
   }
 
   @Get('recommended')
-  findRecommended(@GetUser() user: User): Promise<Project[]> {
+  findRecommended(@GetUser() user: LoggedUser): Promise<Project[]> {
     return this.projectService.findRecommended(user.id);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<Project> {
+  findOne(@Param('id') id: string): Promise<Project> {
     return this.projectService.findOne(id);
   }
 
   @Put(':id')
   @Roles(Role.BUSINESS_MAN)
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateProjectDto: UpdateProjectDto,
-    @GetUser() user: User,
-  ): Promise<Project> {
+  update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto, @GetUser() user: User): Promise<Project> {
     return this.projectService.update(id, updateProjectDto, user.id);
   }
 
   @Delete(':id')
   @Roles(Role.BUSINESS_MAN, Role.ADMIN)
-  remove(@Param('id', ParseIntPipe) id: number, @GetUser() user: User): Promise<void> {
+  remove(@Param('id') id: string, @GetUser() user: LoggedUser): Promise<void> {
     const isAdmin = user.role === Role.ADMIN;
     return this.projectService.remove(id, user.id, isAdmin);
   }

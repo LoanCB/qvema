@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from '@src/auth/decorators/role.decorator';
 import { GetUser } from '@src/auth/decorators/user.decorator';
 import { JwtAuthGuard } from '@src/auth/guards/jwt.guard';
 import { RolesGuard } from '@src/auth/guards/role.guard';
+import { LoggedUser } from '@src/auth/types/logged-user.type';
 import { SwaggerFailureResponse } from '@src/common/helpers/common-set-decorators.helper';
 import { Resources } from '@src/common/types/resource.types';
 import { UpdateUserInterestsDto } from '@src/interest/dtos/update-user-interests.dto';
@@ -33,24 +34,27 @@ export class UserController {
   @Roles(Role.ADMIN)
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    return await this.userService.findOneById(+id);
+    return await this.userService.findOneById(id);
   }
 
   @Roles(Role.ADMIN)
   @Delete(':id')
-  async deleteOne(@Param('id', ParseIntPipe) id: number) {
+  async deleteOne(@Param('id') id: string) {
     return await this.userService.deleteOne(id);
   }
 
   @Roles(Role.ADMIN)
   @Get('interests')
-  getUserInterests(@GetUser() user: User): Promise<Interest[]> {
+  getUserInterests(@GetUser() user: LoggedUser): Promise<Interest[]> {
     return this.interestService.getUserInterests(user.id);
   }
 
   @Roles(Role.ADMIN)
   @Post('interests')
-  updateUserInterests(@GetUser() user: User, @Body() updateUserInterestsDto: UpdateUserInterestsDto): Promise<User> {
+  updateUserInterests(
+    @GetUser() user: LoggedUser,
+    @Body() updateUserInterestsDto: UpdateUserInterestsDto,
+  ): Promise<User> {
     return this.interestService.updateUserInterests(user.id, updateUserInterestsDto.interestIds);
   }
 }

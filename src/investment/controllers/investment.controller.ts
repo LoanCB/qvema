@@ -1,10 +1,10 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { Roles } from '@src/auth/decorators/role.decorator';
 import { GetUser } from '@src/auth/decorators/user.decorator';
 import { JwtAuthGuard } from '@src/auth/guards/jwt.guard';
 import { RolesGuard } from '@src/auth/guards/role.guard';
-import { User } from '@src/user/entities/user.entity';
+import { LoggedUser } from '@src/auth/types/logged-user.type';
 import { Role } from '@src/user/types/role.types';
 import { CreateInvestmentDto } from '../dtos/create-investment.dto';
 import { Investment } from '../entities/investment.entity';
@@ -18,24 +18,24 @@ export class InvestmentController {
 
   @Post()
   @Roles(Role.INVESTOR)
-  create(@Body() createInvestmentDto: CreateInvestmentDto, @GetUser() user: User): Promise<Investment> {
+  create(@Body() createInvestmentDto: CreateInvestmentDto, @GetUser() user: LoggedUser): Promise<Investment> {
     return this.investmentService.create(createInvestmentDto, user.id);
   }
 
   @Get()
   @Roles(Role.INVESTOR)
-  findInvestorInvestments(@GetUser() user: User): Promise<Investment[]> {
+  findInvestorInvestments(@GetUser() user: LoggedUser): Promise<Investment[]> {
     return this.investmentService.findInvestorInvestments(user.id);
   }
 
   @Get('project/:id')
-  findProjectInvestments(@Param('id', ParseIntPipe) projectId: number, @GetUser() user: User): Promise<Investment[]> {
+  findProjectInvestments(@Param('id') projectId: string, @GetUser() user: LoggedUser): Promise<Investment[]> {
     return this.investmentService.findProjectInvestments(projectId, user.id);
   }
 
   @Delete(':id')
   @Roles(Role.INVESTOR)
-  remove(@Param('id', ParseIntPipe) id: number, @GetUser() user: User): Promise<void> {
+  remove(@Param('id') id: string, @GetUser() user: LoggedUser): Promise<void> {
     return this.investmentService.remove(id, user.id);
   }
 }

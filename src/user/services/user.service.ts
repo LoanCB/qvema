@@ -18,7 +18,7 @@ export class UserService {
     return await this.userRepository.find();
   }
 
-  async findOneById(id: number) {
+  async findOneById(id: string) {
     return await this.userRepository.findOneBy({ id });
   }
 
@@ -56,7 +56,7 @@ export class UserService {
     return user;
   }
 
-  async update(id: number, dto: UpdateUserDto) {
+  async update(id: string, dto: UpdateUserDto) {
     const { email, password } = dto;
     if (email) {
       const existingUser = await this.userRepository.findOneBy({ email });
@@ -69,7 +69,7 @@ export class UserService {
     await this.userRepository.update(id, { ...dto, password: hashedPassword });
   }
 
-  async deleteOne(id: number) {
+  async deleteOne(id: string) {
     await this.userRepository.delete({ id });
   }
 }

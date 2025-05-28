@@ -12,11 +12,11 @@ export class Investment extends TimestampEntity {
   investor: Relation<User>;
 
   @Column()
-  investorId: number;
+  investorId: string;
 
   @ManyToOne(() => Project, (project) => project.id)
   project: Relation<Project>;
 
   @Column()
-  projectId: number;
+  projectId: string;
 }

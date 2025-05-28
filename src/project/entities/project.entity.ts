@@ -33,5 +33,5 @@ export class Project extends TimestampEntity {
   owner: Relation<User>;
 
   @Column()
-  ownerId: number;
+  ownerId: string;
 }

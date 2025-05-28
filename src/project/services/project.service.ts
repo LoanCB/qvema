@@ -15,7 +15,7 @@ export class ProjectService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async create(createProjectDto: CreateProjectDto, ownerId: number): Promise<Project> {
+  async create(createProjectDto: CreateProjectDto, ownerId: string): Promise<Project> {
     const project = this.projectRepository.create({
       ...createProjectDto,
       ownerId,
@@ -29,7 +29,7 @@ export class ProjectService {
     });
   }
 
-  async findOne(id: number): Promise<Project> {
+  async findOne(id: string): Promise<Project> {
     const project = await this.projectRepository.findOne({
       where: { id },
       relations: ['owner'],
@@ -42,7 +42,7 @@ export class ProjectService {
     return project;
   }
 
-  async update(id: number, updateProjectDto: UpdateProjectDto, ownerId: number): Promise<Project> {
+  async update(id: string, updateProjectDto: UpdateProjectDto, ownerId: string): Promise<Project> {
     const project = await this.findOne(id);
 
     if (project.ownerId !== ownerId) {
@@ -53,7 +53,7 @@ export class ProjectService {
     return await this.projectRepository.save(project);
   }
 
-  async remove(id: number, userId: number, isAdmin: boolean): Promise<void> {
+  async remove(id: string, userId: string, isAdmin: boolean): Promise<void> {
     const project = await this.findOne(id);
 
     if (!isAdmin && project.ownerId !== userId) {
@@ -63,7 +63,7 @@ export class ProjectService {
     await this.projectRepository.remove(project);
   }
 
-  async findRecommended(userId: number): Promise<Project[]> {
+  async findRecommended(userId: string): Promise<Project[]> {
     const user = await this.userRepository.findOne({
       where: { id: userId },
       relations: ['interests'],

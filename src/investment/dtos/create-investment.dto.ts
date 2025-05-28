@@ -5,7 +5,7 @@ export class CreateInvestmentDto {
   @ApiProperty({ example: 1, description: 'Project ID to invest in' })
   @IsNotEmpty()
   @IsNumber()
-  projectId: number;
+  projectId: string;
 
   @ApiProperty({ example: 1000, description: 'Amount to invest' })
   @IsNotEmpty()

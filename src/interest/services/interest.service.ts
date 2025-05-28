@@ -25,7 +25,7 @@ export class InterestService {
     return interests;
   }
 
-  async updateUserInterests(userId: number, interestIds: number[]): Promise<User> {
+  async updateUserInterests(userId: string, interestIds: number[]): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id: userId },
       relations: ['interests'],
@@ -40,7 +40,7 @@ export class InterestService {
     return await this.userRepository.save(user);
   }
 
-  async getUserInterests(userId: number): Promise<Interest[]> {
+  async getUserInterests(userId: string): Promise<Interest[]> {
     const user = await this.userRepository.findOne({
       where: { id: userId },
       relations: ['interests'],
