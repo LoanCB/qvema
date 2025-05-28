@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Role } from '@src/user/types/role.types';
 import { Request } from 'express';
@@ -12,11 +12,16 @@ export class RolesGuard implements CanActivate {
     const allowedRoles = this.reflector.getAllAndOverride<Role[]>('roles', [context.getHandler(), context.getClass()]);
     if (!allowedRoles) return true;
 
-    const { user } = context.switchToHttp().getRequest<Request>();
+    const request = context.switchToHttp().getRequest<Request>();
+    const user = request.user;
 
-    if (this.matchRoles(allowedRoles, user!.role)) return true;
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
 
-    throw new AuthForbiddenException({ role: user!.role, requiredRoles: allowedRoles.join(', ') });
+    if (this.matchRoles(allowedRoles, user.role)) return true;
+
+    throw new AuthForbiddenException({ role: user.role, requiredRoles: allowedRoles.join(', ') });
   }
 
   private matchRoles(allowedRoles: Role[], userRole: Role): boolean {

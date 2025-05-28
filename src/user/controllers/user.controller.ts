@@ -1,9 +1,11 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from '@src/auth/decorators/role.decorator';
 import { GetUser } from '@src/auth/decorators/user.decorator';
 import { JwtAuthGuard } from '@src/auth/guards/jwt.guard';
 import { RolesGuard } from '@src/auth/guards/role.guard';
+import { SwaggerFailureResponse } from '@src/common/helpers/common-set-decorators.helper';
+import { Resources } from '@src/common/types/resource.types';
 import { UpdateUserInterestsDto } from '@src/interest/dtos/update-user-interests.dto';
 import { Interest } from '@src/interest/entities/interest.entity';
 import { InterestService } from '@src/interest/services/interest.service';
@@ -11,10 +13,11 @@ import { User } from '../entities/user.entity';
 import { UserService } from '../services/user.service';
 import { Role } from '../types/role.types';
 
-@Controller({ path: 'users', version: ['1'] })
-@UseGuards(JwtAuthGuard)
-@UseGuards(RolesGuard)
+@ApiTags(Resources.USER)
+@SwaggerFailureResponse()
+@UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
+@Controller({ path: 'users', version: ['1'] })
 export class UserController {
   constructor(
     private readonly userService: UserService,

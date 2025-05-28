@@ -9,7 +9,12 @@ const description = 'Qvema API for personal expenses manager';
  * @param app {INestApplication}
  */
 export const SwaggerConfig = (app: INestApplication, apiVersion: string) => {
-  const options = new DocumentBuilder().setTitle(title).setDescription(description).setVersion(apiVersion).build();
+  const options = new DocumentBuilder()
+    .setTitle(title)
+    .setDescription(description)
+    .setVersion(apiVersion)
+    .addBearerAuth()
+    .build();
 
   const document = SwaggerModule.createDocument(app, options);
 
