@@ -43,13 +43,11 @@ export class UserController {
     return await this.userService.deleteOne(id);
   }
 
-  @Roles(Role.ADMIN)
   @Get('interests')
   getUserInterests(@GetUser() user: LoggedUser): Promise<Interest[]> {
     return this.interestService.getUserInterests(user.id);
   }
 
-  @Roles(Role.ADMIN)
   @Post('interests')
   updateUserInterests(
     @GetUser() user: LoggedUser,

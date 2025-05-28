@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { UpdateUserDto } from '../dtos/update-user.dto';
 import { User } from '../entities/user.entity';
-import { UserEmailAlreadyExistsException } from '../helpers/user.exception';
+import { UserEmailAlreadyExistsException, UserNotFoundException } from '../helpers/user.exception';
 
 @Injectable()
 export class UserService {
@@ -56,7 +56,7 @@ export class UserService {
     return user;
   }
 
-  async update(id: string, dto: UpdateUserDto) {
+  async update(id: string, dto: UpdateUserDto): Promise<User> {
     const { email, password } = dto;
     if (email) {
       const existingUser = await this.userRepository.findOneBy({ email });
@@ -67,6 +67,12 @@ export class UserService {
 
     const hashedPassword = password ? Password.hash(password) : undefined;
     await this.userRepository.update(id, { ...dto, password: hashedPassword });
+
+    const updatedUser = await this.findOneById(id);
+    if (!updatedUser) {
+      throw new UserNotFoundException({ id });
+    }
+    return updatedUser;
   }
 
   async deleteOne(id: string) {

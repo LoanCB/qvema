@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from '@src/user/dtos/create-user.dto';
+import { User } from '@src/user/entities/user.entity';
 import { UserNotFoundException } from '@src/user/helpers/user.exception';
 import { UserService } from '@src/user/services/user.service';
 import { Role } from '@src/user/types/role.types';
 import { RegisterDto } from '../dtos/register.dto';
+import { UpdateProfileDto } from '../dtos/update-profile.dto';
 import { InvalidCredentialsException } from '../helpers/auth.exception';
 import { Password } from '../helpers/password.utils';
 import { LoggedUserWithToken } from '../types/logged-user.type';
@@ -53,5 +55,38 @@ export class AuthService {
       accessToken: this.jwtService.sign(payload),
       user: returnUser,
     };
+  }
+
+  async getProfile(userId: string): Promise<User> {
+    const user = await this.userService.findOneById(userId);
+    if (!user) {
+      throw new UserNotFoundException({ id: userId });
+    }
+    return user;
+  }
+
+  async updateProfile(userId: string, updateProfileDto: UpdateProfileDto): Promise<User> {
+    const user = await this.userService.findOneById(userId);
+    if (!user) {
+      throw new UserNotFoundException({ id: userId });
+    }
+
+    // Handle password update
+    if (updateProfileDto.password) {
+      if (!updateProfileDto.confirmPassword) {
+        throw new BadRequestException('Confirm password is required when updating password');
+      }
+      if (updateProfileDto.password !== updateProfileDto.confirmPassword) {
+        throw new BadRequestException('Passwords do not match');
+      }
+      // Hash the password before updating
+      updateProfileDto.password = Password.hash(updateProfileDto.password);
+    } else if (updateProfileDto.confirmPassword) {
+      throw new BadRequestException('Password is required when confirming password');
+    }
+
+    // Remove confirmPassword from the DTO before passing to user service
+    const { confirmPassword, ...updateData } = updateProfileDto;
+    return await this.userService.update(userId, updateData);
   }
 }
