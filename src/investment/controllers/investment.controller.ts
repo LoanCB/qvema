@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { Roles } from '@src/auth/decorators/role.decorator';
 import { GetUser } from '@src/auth/decorators/user.decorator';
 import { JwtAuthGuard } from '@src/auth/guards/jwt.guard';
@@ -11,6 +12,7 @@ import { InvestmentService } from '../services/investment.service';
 
 @Controller({ path: 'investments', version: ['1'] })
 @UseGuards(JwtAuthGuard, RolesGuard)
+@ApiBearerAuth()
 export class InvestmentController {
   constructor(private readonly investmentService: InvestmentService) {}
 

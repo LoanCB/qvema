@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { Roles } from '@src/auth/decorators/role.decorator';
 import { GetUser } from '@src/auth/decorators/user.decorator';
 import { JwtAuthGuard } from '@src/auth/guards/jwt.guard';
@@ -11,6 +12,9 @@ import { Project } from '../entities/project.entity';
 import { ProjectService } from '../services/project.service';
 
 @Controller({ path: 'projects', version: ['1'] })
+@UseGuards(JwtAuthGuard)
+@UseGuards(RolesGuard)
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}

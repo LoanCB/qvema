@@ -1,9 +1,12 @@
 import { SwaggerConfig } from '@config/helpers/swagger.config';
 import { ApiConfigService } from '@config/service/api-config.service';
-import { Logger, VersioningType } from '@nestjs/common';
+import { Logger, ValidationError, ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
+import { HttpExceptionFilter } from './common/filters/custom-http-exception.filter';
+import { InvalidDtoException } from './common/helpers/error-codes/custom.exception';
+import { buildErrors } from './common/helpers/error-codes/validation-error.helper';
 
 const logger = new Logger('QVEMA');
 
@@ -17,6 +20,16 @@ async function bootstrap() {
 
   app.setGlobalPrefix(APP_ROUTE_PREFIX);
   app.enableVersioning({ type: VersioningType.URI });
+  app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      exceptionFactory: (validationErrors: ValidationError[] = []) => {
+        return new InvalidDtoException(buildErrors(validationErrors));
+      },
+    }),
+  );
   app.enableCors();
 
   SwaggerConfig(app, configService.get('api_version'));

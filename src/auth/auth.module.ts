@@ -5,6 +5,7 @@ import { PassportModule } from '@nestjs/passport';
 import configuration from '@src/config/helpers/api-config.config';
 import { ApiConfigService } from '@src/config/service/api-config.service';
 import { UserModule } from '@src/user/user.module';
+import { AuthController } from './controllers/auth.controller';
 import { JwtStrategy } from './helpers/jwt.strategy';
 import { AuthService } from './services/auth.service';
 
@@ -13,15 +14,15 @@ const configService = new ApiConfigService(nestConfigService);
 
 @Module({
   imports: [
-    UserModule,
     PassportModule,
     JwtModule.register({
       global: true,
       secret: configService.get('jwt.secret'),
       signOptions: { expiresIn: configService.get('jwt.duration') },
     }),
+    UserModule,
   ],
+  controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
-  exports: [AuthService],
 })
 export class AuthModule {}
